@@ -1,0 +1,37 @@
+:root {
+    --transition: 0.3s;
+    --radius: 8px;
+    --spacing: 16px;
+}
+
+.light {
+    --bg: #f0f0f0;
+    --text: #111;
+    --card: #ffffff;
+    --primary: #4caf50;
+    --secondary: #f44336;
+}
+
+.dark {
+    --bg: #121212;
+    --text: #f5f5f5;
+    --card: #1e1e1e;
+    --primary: #81c784;
+    --secondary: #e57373;
+}
+
+body,
+.light,
+.dark {
+    transition:
+        background-color 0.3s,
+        color 0.3s;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Arial", sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+}
