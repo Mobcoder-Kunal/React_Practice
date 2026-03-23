@@ -45,7 +45,7 @@ export function cartReducer(state, action) {
             return {
                 ...state,
                 cart: state.cart.map(
-                    item => item.id === action.payload ? {...item, quantity: item.quantity + 1} : item
+                    item => item.id === action.payload ? {...item, quantity: item.quantity - 1} : item
                 ).filter(item => item.quantity > 0)
             };
 
