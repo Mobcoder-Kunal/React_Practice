@@ -10,12 +10,8 @@ const PORT = 3000;
 import authRoutes from "./routes/auth"
 import notesRouter from "./routes/notes";
 
-
-
 import { connectDB } from "./db";
 connectDB();
-
-
 
 app.use(cors());
 app.use(express.json());

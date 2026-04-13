@@ -1,10 +1,23 @@
-import axios from "axios";
+import api from "./axios"
 
-const API = "http://localhost:3000";
+export const getNotes = () => {
+    return api.get("/notes");
+};
 
-export const getNotes = () =>
-    axios.get(`${API}/notes`, {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-    });
+export const createNote = (data: {
+    title: string;
+    content: string;
+}) => {
+    return api.post("/notes", data);
+};
+
+export const deleteNote = (id: string) => {
+    return api.delete(`/notes/${id}`);
+};
+
+export const updateNote = (
+    id: string,
+    data: { title: string; content: string }
+) => {
+    return api.put(`/notes/${id}`, data);
+};
