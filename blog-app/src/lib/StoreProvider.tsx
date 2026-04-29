@@ -8,7 +8,6 @@ function StoreProvider({ children }: { children: React.ReactNode }) {
     if(!storeRef.current) {
         // create store instance for first time render
         storeRef.current = makeStore();
-        storeRef.current.dispatch({ type: '@@APP/INITIALIZED' });
     }
 
     return <Provider store={storeRef.current}>{ children }</Provider>

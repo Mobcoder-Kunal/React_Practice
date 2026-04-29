@@ -17,6 +17,8 @@ const loggerMiddleware: Middleware<{}, RootState> = (store) => (next) => (action
 };
 
 // 2. THE STORE -> makeStore: Instead of a static variable, we use a function. In Next.js, this ensures the server doesn't share state between different users (Critical for security).
+// we don't just create a variable; we create a Factory called makeStore.
+// Why a factory? In Next.js, the server handles many users at once. If we used a single global variable, "User A" might accidentally see "User B's" blog post. By using a function, every time a new user visits, Next.js calls makeStore() and gives them their own private "Kitchen."
 export const makeStore = () => {
     return configureStore({
         reducer: {
@@ -32,6 +34,6 @@ export const makeStore = () => {
 };
 
 // 3. THE "HOLY TRINITY"
-export type AppStore = ReturnType<typeof makeStore>;      // This is TypeScript "Inference." Instead of manually writing a complex Interface for the store, we tell TS: "Look at the function makeStore and figure out what it returns." If you add a new slice to the reducer, AppStore updates automatically.
+export type AppStore = ReturnType<typeof makeStore>;      // Captures the shape of the store -> This is TypeScript "Inference." Instead of manually writing a complex Interface for the store, we tell TS: "Look at the function makeStore and figure out what it returns." If you add a new slice to the reducer, AppStore updates automatically.
 export type RootState = ReturnType<AppStore['getState']>;
 export type AppDispatch = AppStore['dispatch'];

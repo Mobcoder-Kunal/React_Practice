@@ -11,6 +11,6 @@ export interface EditorBlock {
 
 export interface EditorState {
     blocks: EditorBlock[];
-    activeBlocksId: string | null;
+    activeBlockId: string | null;
     isSaving: boolean;
 }

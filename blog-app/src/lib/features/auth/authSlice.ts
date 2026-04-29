@@ -27,3 +27,14 @@ export const authSlice = createSlice({
 
 export const { setUser, logout } = authSlice.actions;
 export default authSlice.reducer;
+
+// When you write PayloadAction<AuthState['user']>, TypeScript internally constructs a type that looks like this:
+
+// TypeScript
+// {
+//   type: string;                    Added automatically by Redux
+//   payload: {                       This part comes from your Generic!
+//     name: string;
+//     email: string;
+//   } | null;
+// }

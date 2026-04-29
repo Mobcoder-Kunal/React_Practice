@@ -62,3 +62,5 @@ The "Why" (The Deep Reason):
 Developer Velocity: When you type const user = useAppSelector(state => state.auth.u...), your IDE will instantly suggest .user. You don't have to check your files to remember if it was user or userInfo.
 
 Refactor Safety: If you decide to rename user to profile in your slice, TypeScript will immediately turn your entire project "red" where you used the old name. In a production app with 50+ files, this saves days of debugging.
+
+-> To build the Notion-style UI, we are going to create a "Renderer" system. This is a common architectural pattern in production apps where you decouple the Data (Redux) from the Visuals (React).
