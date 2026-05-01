@@ -3,7 +3,7 @@
 import { useAppSelector } from "../lib/hooks";
 import EditableBlock from "./EditableBlock";
 
-function BlockRenderer() {
+function    BlockRenderer() {
     // 1. Get the blocks from the store
     const blocks = useAppSelector(state => state.editor.blocks)
 

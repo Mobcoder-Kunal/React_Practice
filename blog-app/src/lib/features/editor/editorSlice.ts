@@ -8,18 +8,33 @@ const initialState: EditorState = {
     ],
     activeBlockId: '1',
     isSaving: false,
+    isPublic: false,
+    currentPageId: null,
 };
 
 export const editorSlice = createSlice({
     name: 'editor',
     initialState,
     reducers: {
+        setBlocks: (state, action) => { state.blocks = action.payload; },
+        
+        togglePublicStatus: (state) => {
+            state.isPublic = !state.isPublic;
+        },
+
+        setCurrentPage: (state, action: PayloadAction<{ _id: string; isPublic: boolean; blocks: EditorBlock[] }>) => {
+            state.currentPageId = action.payload._id;
+            state.isPublic = action.payload.isPublic;
+            state.blocks = action.payload.blocks;
+        },
+
         updateBlockContent: (state, action: PayloadAction<{ id: string; content: string }>) => {
             const block = state.blocks.find(block => block.id === action.payload.id);
             if (block) {
                 block.content = action.payload.content;
             }
         },
+        
         addBlock: (state, action: PayloadAction<{ afterId: string, type: EditorBlock['type'] }>) => {
             const index = state.blocks.findIndex(block => block.id === action.payload.afterId)
             const newBlock: EditorBlock = {
@@ -27,44 +42,47 @@ export const editorSlice = createSlice({
                 type: action.payload.type,
                 content: '',
             };
-
-            // If index is -1 (not found), it adds to the end. 
-            // Otherwise, it adds right after the current block.
             const insertAt = index === -1 ? state.blocks.length : index + 1;
-
             state.blocks.splice(insertAt, 0, newBlock);
             state.activeBlockId = newBlock.id;
         },
+
         deleteBlock: (state, action: PayloadAction<{ id: string }>) => {
             const index = state.blocks.findIndex(block => block.id === action.payload.id);
-
-            if (index > 0) {
-                const previousBlock = state.blocks[index - 1];
-                state.activeBlockId = previousBlock.id;
+            if (index !== -1) {
+                if (state.activeBlockId === action.payload.id) {
+                    if (index > 0) {
+                        state.activeBlockId = state.blocks[index - 1].id;
+                    } else if (index < state.blocks.length - 1) {
+                        state.activeBlockId = state.blocks[index + 1].id;
+                    } else {
+                        const newBlock: EditorBlock = { id: Date.now().toString(), type: 'text', content: '' };
+                        state.blocks.push(newBlock);
+                        state.activeBlockId = newBlock.id;
+                    }
+                }
                 state.blocks.splice(index, 1);
             }
         },
-        changeBlockType: (state, action: PayloadAction<{ id: string, type: EditorBlock['type'] }>) => {
-            const block = state.blocks.find(block => block.id === action.payload.id);
+
+        changeBlockType: (state, action: PayloadAction<{ id: string; type: EditorBlock['type'] }>) => {
+            const block = state.blocks.find(b => b.id === action.payload.id);
             if (block) {
                 block.type = action.payload.type;
-                if (action.payload.type === 'image') {
-                    // Default placeholder until they upload
-                    block.content = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800';
-                } else {
+                if (action.payload.type !== 'image') {
                     block.content = block.content.replace('/', '');
+                } else {
+                    block.content = '';
                 }
             }
         },
+
         mergeWithPrevious: (state, action: PayloadAction<{ id: string }>) => {
             const index = state.blocks.findIndex(block => block.id === action.payload.id);
-
             if (index > 0) {
                 const currentBlock = state.blocks[index];
                 const previousBlock = state.blocks[index - 1];
-
-                const combinedContent = previousBlock.content + currentBlock.content;
-                previousBlock.content = combinedContent;
+                previousBlock.content += currentBlock.content;
                 state.activeBlockId = previousBlock.id;
                 state.blocks.splice(index, 1);
             }
@@ -72,5 +90,16 @@ export const editorSlice = createSlice({
     },
 });
 
-export const { updateBlockContent, addBlock, deleteBlock, changeBlockType, mergeWithPrevious } = editorSlice.actions;
+// Added togglePublicStatus and setCurrentPage to exports
+export const { 
+    updateBlockContent, 
+    addBlock, 
+    deleteBlock, 
+    changeBlockType, 
+    mergeWithPrevious, 
+    setBlocks,
+    togglePublicStatus,
+    setCurrentPage
+} = editorSlice.actions;
+
 export default editorSlice.reducer;

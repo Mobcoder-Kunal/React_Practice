@@ -13,4 +13,6 @@ export interface EditorState {
     blocks: EditorBlock[];
     activeBlockId: string | null;
     isSaving: boolean;
+    isPublic: boolean;
+    currentPageId: string | null;
 }

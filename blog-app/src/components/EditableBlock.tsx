@@ -1,10 +1,10 @@
 'use client';
 import { useEffect, useRef, useState } from "react";
+import CommandMenu from "./CommandMenu";
 import { useAppDispatch } from "../lib/hooks";
 import { useAppSelector } from "../lib/hooks";
-import { updateBlockContent, addBlock, deleteBlock, changeBlockType, mergeWithPrevious } from "../lib/features/editor/editorSlice";
 import { EditorBlock } from "../lib/features/editor/types";
-import CommandMenu from "./CommandMenu";
+import { updateBlockContent, addBlock, deleteBlock, changeBlockType, mergeWithPrevious } from "../lib/features/editor/editorSlice";
 
 interface Props {
     block: EditorBlock,
@@ -97,35 +97,70 @@ function EditableBlock({ block }: Props) {
         }
     }
 
-    const handleSelect = (type: 'text' | 'heading') => {
+    const handleSelect = (type: 'text' | 'heading' | 'image') => {
         dispatch(changeBlockType({ id: block.id, type }));
         setShowMenu(false);
     }
 
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                // This converts the image file into a very long string
+                const base64String = reader.result as string;
+                // Update our Redux content with the image data
+                dispatch(updateBlockContent({ id: block.id, content: base64String }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     if (block.type === 'image') {
         return (
-            <div className="group relative my-4">
-                {/* The Image Container */}
-                <div className="relative overflow-hidden rounded-lg border-2 border-transparent hover:border-blue-400 transition-all">
-                    <img
-                        src={block.content || 'https://via.placeholder.com/800x400?text=Click+to+upload+image'}
-                        alt="User content"
-                        className="w-full h-auto block"
-                    />
-
-                    {/* Overlay to delete or change image */}
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="relative group my-4" key={`image-${block.id}`}>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                    accept="image/*"
+                />
+                {block.content ? (
+                    <div className="relative">
+                        <img src={block.content} className="w-full h-auto rounded-lg" alt="Uploaded content" />
                         <button
-                            onClick={() => dispatch(deleteBlock({ id: block.id }))}
-                            className="bg-white/90 p-2 rounded-md shadow-sm hover:bg-red-50 text-red-500"
+                            onClick={() => dispatch(updateBlockContent({ id: block.id, content: '' }))}
+                            className="absolute top-2 left-2 bg-white/80 p-1 rounded text-xs hover:bg-white"
                         >
-                            Delete
+                            Change Image
                         </button>
                     </div>
-                </div>
+                ) : (
+                    <div
+                        onClick={() => fileInputRef.current?.click()}
+                        className="p-12 border-2 border-dashed border-slate-200 rounded-lg bg-slate-50 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 transition-colors"
+                    >
+                        <span className="text-3xl mb-2">🖼️</span>
+                        <p className="text-slate-500 font-medium">Click to upload an image</p>
+                    </div>
+                )}
+                <button
+                    onClick={() => {
+                        console.log("Delete clicked for ID:", block.id);
+                        dispatch(deleteBlock({ id: block.id }));
+                    }}
+                    className="absolute top-2 right-2 bg-red-500 text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                    Delete
+                </button>
             </div>
         );
     }
+
+
     return (
         <div className="relative">
             <div
