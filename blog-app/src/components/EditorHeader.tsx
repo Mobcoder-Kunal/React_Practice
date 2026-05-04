@@ -15,7 +15,7 @@ export default function EditorHeader() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                _id: currentPageId, // Ensure this matches the key expected by backend
+                _id: currentPageId,
                 blocks, 
                 isPublic 
             }),
